@@ -1,9 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { CardGlowWrapper } from '@/components/ui/CardGlowWrapper';
+import { useState } from 'react';
+
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
+
+import Link from 'next/link';
+
 import { motion } from 'framer-motion';
+
+import { CardGlowWrapper } from '@/components/ui/CardGlowWrapper';
 
 interface HeroTileProps {
   name: string;
@@ -11,23 +16,68 @@ interface HeroTileProps {
 }
 
 export function HeroTile({ name, streakDays }: HeroTileProps) {
-  const [greeting, setGreeting] = useState('Welcome back');
-
-  useEffect(() => {
+  // Lazy initialization for greeting based on current hour
+  const [greeting] = useState(() => {
     const hours = new Date().getHours();
-    if (hours < 12) setGreeting('Good morning');
-    else if (hours < 18) setGreeting('Good afternoon');
-    else setGreeting('Good evening');
-  }, []);
+    if (hours < 12) return 'Good morning';
+    else if (hours < 18) return 'Good afternoon';
+    else return 'Good evening';
+  });
+
+  // Lazy initialization for lastRoute from localStorage if available
+  const [lastRoute] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('last_visited_route');
+      if (saved && saved !== '/') return saved;
+    }
+    return null;
+  });
+
+  // Map route names to cleaner UI handles
+  const getRouteLabel = (route: string) => {
+    switch (route) {
+      case '/courses':
+        return 'Academy Syllabus';
+      case '/analytics':
+        return 'System Telemetry';
+      case '/schedule':
+        return 'Planner Chronology';
+      case '/settings':
+        return 'System Settings';
+      default:
+        return 'Last Workspace';
+    }
+  };
 
   return (
     <CardGlowWrapper glowColor="indigo" className="h-full flex flex-col justify-between p-6 bg-gradient-to-br from-indigo-950/20 via-zinc-900/40 to-zinc-950/50">
       <div className="grain-mesh" />
       <header className="space-y-2">
-        <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-xs text-indigo-400 font-medium">
-          <DynamicIcon name="Award" size={13} className="animate-bounce" />
-          <span>Active Learning Quest</span>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-xs text-indigo-400 font-medium">
+            <DynamicIcon name="Award" size={13} className="animate-bounce" />
+            <span>Active Learning Quest</span>
+          </div>
+
+          {/* Continue where you left off session indicator */}
+          {lastRoute && (
+            <motion.div
+              initial={{ opacity: 0, x: -5 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/5 px-3 py-1 text-[10px] text-violet-300 font-semibold"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-violet-400 animate-pulse" />
+              <span>Resume: </span>
+              <Link
+                href={lastRoute}
+                className="underline hover:text-white transition-colors"
+              >
+                {getRouteLabel(lastRoute)}
+              </Link>
+            </motion.div>
+          )}
         </div>
+
         <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white mt-2">
           {greeting}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400">{name}</span>!
         </h2>

@@ -4,7 +4,7 @@ import { Course } from '@/types/dashboard';
 import { CardGlowWrapper } from '@/components/ui/CardGlowWrapper';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
-import { motion } from 'framer-motion';
+
 
 interface CourseCardProps {
   course: Course;

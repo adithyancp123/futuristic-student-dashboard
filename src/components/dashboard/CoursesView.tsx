@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Course } from '@/types/dashboard';
 import { CourseCard } from '@/components/dashboard/CourseCard';
-import { CardGlowWrapper } from '@/components/ui/CardGlowWrapper';
+
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
 import { motion, Variants } from 'framer-motion';
 
@@ -129,17 +129,41 @@ export function CoursesView({ courses }: CoursesViewProps) {
           ))}
         </motion.section>
       ) : (
-        <div className="flex flex-col items-center justify-center p-12 glass-panel rounded-2xl border border-white/5 min-h-[300px] text-center space-y-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          className="flex flex-col items-center justify-center p-12 glass-panel rounded-2xl border border-white/5 min-h-[350px] text-center space-y-5 relative overflow-hidden"
+        >
           <div className="grain-mesh" />
-          <div className="p-3 bg-zinc-800/20 border border-zinc-700/20 rounded-2xl text-zinc-500">
-            <DynamicIcon name="Terminal" size={24} />
+          {/* Animated floating empty state illustration */}
+          <div className="relative flex items-center justify-center h-16 w-16 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 animate-float shadow-[0_0_15px_rgba(99,102,241,0.15)]">
+            <div className="absolute inset-0 rounded-full border border-indigo-500/10 animate-ping opacity-25" />
+            <DynamicIcon name="Search" size={24} />
           </div>
-          <div>
-            <h4 className="font-bold text-white uppercase tracking-wider text-xs">No Matching Syllabus Found</h4>
-            <p className="text-xs text-zinc-500 mt-1">Adjust search tags or category filters to sync curriculum.</p>
+          
+          <div className="space-y-1 max-w-sm relative z-10">
+            <h4 className="font-extrabold text-white uppercase tracking-wider text-xs">Curriculum Registry Empty</h4>
+            <p className="text-xs text-zinc-500 font-semibold leading-relaxed">
+              No academic syllabus matches your search keywords or active category filters. Expand your query parameters to resume sync.
+            </p>
           </div>
-        </div>
+
+          <button
+            onClick={() => {
+              setSearchTerm('');
+              setSelectedCategory('All');
+            }}
+            className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] uppercase tracking-wider shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] transition-all cursor-pointer relative z-10 border border-indigo-400/20"
+          >
+            Reset Search Filters
+          </button>
+        </motion.div>
       )}
+      
+      <footer className="text-center text-[9px] font-bold uppercase tracking-widest text-zinc-600 mt-12 pb-4 select-none">
+        Telemetry synced • Latency 14ms • Verified stable
+      </footer>
     </div>
   );
 }

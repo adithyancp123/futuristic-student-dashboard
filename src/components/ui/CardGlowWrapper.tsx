@@ -17,7 +17,8 @@ export function CardGlowWrapper({
   glowColor = 'indigo',
   as = 'article',
 }: CardGlowWrapperProps) {
-  const containerRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const [isHovered, setIsHovered] = useState(false);
 
   // Motion values for raw mouse coordinates
@@ -118,16 +119,15 @@ export function CardGlowWrapper({
     hoverActive.set(0);
   };
 
-  // Determine motion element tag type statically to optimize SSR
-  const MotionTag = as === 'article' 
-    ? motion.article 
-    : as === 'section' 
-      ? motion.section 
+  const MotionTag: React.ElementType = as === 'article'
+    ? motion.article
+    : as === 'section'
+      ? motion.section
       : motion.div;
 
   return (
     <MotionTag
-      ref={containerRef as any}
+      ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -152,7 +152,7 @@ export function CardGlowWrapper({
           background: spotlightBackground,
         }}
       />
-      
+
       {/* Content wrapper */}
       <div className="relative z-10 w-full h-full">
         {children}

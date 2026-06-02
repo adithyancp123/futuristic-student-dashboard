@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+// No React hooks needed in Sidebar
 import { cn } from '@/lib/utils';
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
+import Image from 'next/image';
 interface SidebarProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -24,17 +24,7 @@ const NAV_ITEMS = [
 ];
 
 export function Sidebar({ isOpen, setIsOpen, avatarUrl, studentName = 'Student', studentLevel = 1 }: SidebarProps) {
-  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    // Avoid SSR hydration mismatch: render basic container matching initial closed state (w-20)
-    return <aside className="hidden md:flex flex-col w-20 border-r border-white/5 bg-[#05021a]/85 h-screen" />;
-  }
 
   return (
     <>
@@ -95,7 +85,7 @@ export function Sidebar({ isOpen, setIsOpen, avatarUrl, studentName = 'Student',
                       isActive ? "text-white font-semibold" : "hover:bg-white/5 hover:text-white text-zinc-400"
                     )}
                   >
-                    {/* Framer motion layout selection background */}
+                    {/* Framer motion layout */}
                     {isActive && (
                       <motion.span
                         layoutId="activeSidebarNav"
@@ -126,11 +116,17 @@ export function Sidebar({ isOpen, setIsOpen, avatarUrl, studentName = 'Student',
         <footer className="p-4 border-t border-white/5 bg-zinc-950/20">
           <div className="flex items-center gap-3 overflow-hidden">
             <figure className="relative h-10 w-10 flex-shrink-0">
-              <img
-                src={avatarUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&h=256&q=80"}
-                alt={studentName}
-                className="h-full w-full rounded-xl object-cover ring-2 ring-indigo-500/35"
-              />
+              <Image
+                  src={avatarUrl || "/placeholder-avatar.svg"}
+                  alt={studentName}
+                  className="h-full w-full rounded-xl object-cover ring-2 ring-indigo-500/35"
+                  width={256}
+                  height={256}
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.src = "/placeholder-avatar.svg";
+                  }}
+                />
               <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white shadow">
                 {studentLevel}
               </span>

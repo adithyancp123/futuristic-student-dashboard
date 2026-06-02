@@ -12,12 +12,21 @@ interface UpcomingTasksTileProps {
 
 export function UpcomingTasksTile({ initialTasks }: UpcomingTasksTileProps) {
   const [tasks, setTasks] = useState<DashboardTask[]>(initialTasks);
+  const [lastCompletedId, setLastCompletedId] = useState<string | null>(null);
 
   const toggleTask = (id: string) => {
     setTasks(prev =>
-      prev.map(task =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
+      prev.map(task => {
+        if (task.id === id) {
+          const nextCompleted = !task.completed;
+          if (nextCompleted) {
+            setLastCompletedId(id);
+            setTimeout(() => setLastCompletedId(null), 1000);
+          }
+          return { ...task, completed: nextCompleted };
+        }
+        return task;
+      })
     );
   };
 
@@ -48,14 +57,27 @@ export function UpcomingTasksTile({ initialTasks }: UpcomingTasksTileProps) {
       </header>
 
       {/* Semantic list layout for task records */}
-      <ul className="space-y-3 flex-1 overflow-y-auto no-scrollbar max-h-56 pr-1" aria-label="Assignment checklist">
+      <ul className="space-y-3 flex-1 overflow-y-auto no-scrollbar max-h-56 pr-1 relative" aria-label="Assignment checklist">
         {tasks.map(task => (
           <li
             key={task.id}
             onClick={() => toggleTask(task.id)}
-            className="flex items-start justify-between gap-3 p-3 rounded-xl border border-white/5 bg-white/2 hover:bg-white/5 cursor-pointer transition-all duration-200 select-none group"
+            className="flex items-start justify-between gap-3 p-3 rounded-xl border border-white/5 bg-white/2 hover:bg-white/5 cursor-pointer transition-all duration-200 select-none group relative overflow-hidden"
           >
-            <div className="flex items-start gap-3 min-w-0">
+            {/* Dopamine micro-celebration border ripple overlay */}
+            <AnimatePresence>
+              {lastCompletedId === task.id && (
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0.8 }}
+                  animate={{ scale: 1.04, opacity: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.7, ease: "easeOut" }}
+                  className="absolute inset-0 rounded-xl border border-rose-500/60 shadow-[0_0_20px_rgba(244,63,94,0.3)] pointer-events-none z-20"
+                />
+              )}
+            </AnimatePresence>
+
+            <div className="flex items-start gap-3 min-w-0 relative z-10">
               {/* Animated Checkbox utilizing transform physics */}
               <button
                 className="mt-0.5 flex h-4 w-4 items-center justify-center rounded-md border text-white transition-colors flex-shrink-0 cursor-pointer"
@@ -94,7 +116,7 @@ export function UpcomingTasksTile({ initialTasks }: UpcomingTasksTileProps) {
             </div>
 
             {/* Custom styled category badge */}
-            <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex-shrink-0 ${getCategoryColor(task.category)}`}>
+            <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex-shrink-0 relative z-10 ${getCategoryColor(task.category)}`}>
               {task.category}
             </span>
           </li>

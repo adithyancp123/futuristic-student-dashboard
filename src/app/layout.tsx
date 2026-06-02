@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { AmbientProvider } from '@/components/ui/AmbientProvider';
+import { KeyboardProvider } from '@/components/ui/KeyboardProvider';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { getDashboardData } from '@/lib/supabase/server';
@@ -39,9 +41,13 @@ export default async function RootLayout({
       style={{ colorScheme: 'dark' }}
     >
       <body className="min-h-full flex flex-col bg-[#030014] text-zinc-50 overflow-hidden">
-        <DashboardLayout profile={data.profile}>
-          {children}
-        </DashboardLayout>
+        <KeyboardProvider>
+          <AmbientProvider>
+            <DashboardLayout profile={data.profile}>
+              {children}
+            </DashboardLayout>
+          </AmbientProvider>
+        </KeyboardProvider>
       </body>
     </html>
   );

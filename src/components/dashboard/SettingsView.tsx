@@ -5,6 +5,7 @@ import { CardGlowWrapper } from '@/components/ui/CardGlowWrapper';
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
 import { motion, Variants } from 'framer-motion';
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface SettingsViewProps {
   profile: StudentProfile;
@@ -35,6 +36,9 @@ export function SettingsView({ profile }: SettingsViewProps) {
   const [holographicUi, setHolographicUi] = useState(true);
   const [dbWebhooks, setDbWebhooks] = useState(true);
   const [emailsNotify, setEmailsNotify] = useState(false);
+  
+  const avatarUrl = profile.avatar_url;
+  const studentName = profile.full_name;
 
   return (
     <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
@@ -65,10 +69,16 @@ export function SettingsView({ profile }: SettingsViewProps) {
             {/* Profile contents */}
             <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10 flex-1">
               <figure className="relative h-20 w-20 flex-shrink-0">
-                <img
-                  src={profile.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&h=256&q=80"}
-                  alt={profile.full_name}
-                  className="h-full w-full rounded-2xl object-cover ring-2 ring-indigo-500/35 shadow-lg"
+                <Image
+                  src={avatarUrl || "/placeholder-avatar.svg"}
+                  alt={studentName}
+                  className="h-full w-full rounded-xl object-cover ring-2 ring-indigo-500/35"
+                  width={256}
+                  height={256}
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.src = "/placeholder-avatar.svg";
+                  }}
                 />
                 <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white shadow ring-2 ring-[#030014]">
                   {profile.level}
@@ -197,6 +207,10 @@ export function SettingsView({ profile }: SettingsViewProps) {
           </CardGlowWrapper>
         </motion.div>
       </motion.section>
+      
+      <footer className="text-center text-[9px] font-bold uppercase tracking-widest text-zinc-600 mt-12 pb-4 select-none">
+        Telemetry synced • Latency 14ms • Verified stable
+      </footer>
     </div>
   );
 }
