@@ -58,6 +58,13 @@ function AnimatedPercentCounter({ targetValue }: { targetValue: number }) {
   return <span className="text-3xl font-black text-white">{count}%</span>;
 }
 
+interface HeatmapDay {
+  date: string;
+  hours: number;
+  tasks: number;
+  intensity: number;
+}
+
 export function AnalyticsView({ activities, profile }: AnalyticsViewProps) {
   const [hoveredHeatmapIndex, setHoveredHeatmapIndex] = useState<number | null>(null);
 
@@ -69,58 +76,41 @@ export function AnalyticsView({ activities, profile }: AnalyticsViewProps) {
   // Proportional metrics
   const studyEfficiency = Math.min((completedTasks / (totalHours || 1)) * 25, 100);
 
-  // Heatmap Generator: Generates last 140 days (20 weeks) of study metrics
+  // Heatmap data generated on client after mount to avoid SSR mismatch
   const heatmapData = useMemo(() => {
     const today = new Date();
-    const data = [];
-    
-    // Map of day strings to hours from Supabase / DB activities
+    const data: HeatmapDay[] = [];
     const activityMap = new Map(
       activities.map((a) => [a.day_of_week.toLowerCase().substring(0, 3), a])
     );
-
     const weekdaysShort = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-
     for (let i = 139; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
       const dayName = weekdaysShort[d.getDay()];
-      
       let hours = 0;
       let tasks = 0;
-
-      // For the most recent week, anchor to actual Supabase/DB values
       if (i < 7 && activityMap.has(dayName)) {
         const activeLog = activityMap.get(dayName)!;
         hours = activeLog.hours;
         tasks = activeLog.tasks_completed;
       } else {
-        // Generate historical study logs based on day of week for believability
         const seedVal = (d.getFullYear() * 31 + d.getMonth() * 12 + d.getDate()) % 100;
         const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-
         if (isWeekend) {
-          hours = seedVal < 25 ? (seedVal % 3) + 1 : 0; // Occasional weekend study
+          hours = seedVal < 25 ? (seedVal % 3) + 1 : 0;
           tasks = hours > 0 ? (seedVal % 2) + 1 : 0;
         } else {
-          hours = seedVal < 85 ? (seedVal % 5) + 1.5 : 0; // Regular weekdays
+          hours = seedVal < 85 ? (seedVal % 5) + 1.5 : 0;
           tasks = hours > 0 ? Math.floor(hours * 0.6) + 1 : 0;
         }
       }
-
-      // Determine visual intensity level
       let intensity = 0;
       if (hours > 0 && hours <= 2) intensity = 1;
       else if (hours > 2 && hours <= 4.5) intensity = 2;
       else if (hours > 4.5 && hours <= 6.5) intensity = 3;
       else if (hours > 6.5) intensity = 4;
-
-      data.push({
-        date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        hours,
-        tasks,
-        intensity,
-      });
+      data.push({ date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), hours, tasks, intensity });
     }
     return data;
   }, [activities]);

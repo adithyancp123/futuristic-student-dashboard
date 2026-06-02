@@ -19,14 +19,19 @@ const moodMap: Record<Mood, { '--ambient-glow': string; '--ambient-bg': string }
  * background gradient that uses only transform/opacity for GPU acceleration.
  */
 export function AmbientProvider({ children }: { children: React.ReactNode }) {
-const [mood] = useState<Mood>(() => {
-  const now = new Date();
-  const hour = now.getHours();
-  if (hour >= 5 && hour < 11) return 'morning';
-  if (hour >= 11 && hour < 17) return 'afternoon';
-  if (hour >= 17 && hour < 21) return 'evening';
-  return 'night';
-});
+  const [mood, setMood] = useState<Mood>('morning');
+  // Determine mood on client mount to avoid SSR mismatch
+  useEffect(() => {
+    const now = new Date();
+    const hour = now.getHours();
+    let current: Mood = 'morning';
+    if (hour >= 5 && hour < 11) current = 'morning';
+    else if (hour >= 11 && hour < 17) current = 'afternoon';
+    else if (hour >= 17 && hour < 21) current = 'evening';
+    else current = 'night';
+// eslint-disable-next-line react-hooks/set-state-in-effect
+    setMood(current);
+  }, []);
 
 useEffect(() => {
   const root = document.documentElement;

@@ -16,23 +16,18 @@ interface HeroTileProps {
 }
 
 export function HeroTile({ name, streakDays }: HeroTileProps) {
-  // Lazy initialization for greeting based on current hour
+  // Mounted state removed; not needed for SSR-safe rendering
+  // Initialize greeting and lastRoute safely for SSR
   const [greeting] = useState(() => {
-    const hours = new Date().getHours();
-    if (hours < 12) return 'Good morning';
-    else if (hours < 18) return 'Good afternoon';
-    else return 'Good evening';
+    if (typeof window === 'undefined') return 'Welcome back';
+    const h = new Date().getHours();
+    return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   });
-
-  // Lazy initialization for lastRoute from localStorage if available
-  const [lastRoute] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('last_visited_route');
-      if (saved && saved !== '/') return saved;
-    }
-    return null;
+  const [lastRoute] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    const saved = localStorage.getItem('last_visited_route');
+    return saved && saved !== '/' ? saved : null;
   });
-
   // Map route names to cleaner UI handles
   const getRouteLabel = (route: string) => {
     switch (route) {
@@ -59,23 +54,22 @@ export function HeroTile({ name, streakDays }: HeroTileProps) {
             <span>Active Learning Quest</span>
           </div>
 
-          {/* Continue where you left off session indicator */}
-          {lastRoute && (
+                      {/* Resume badge - always render motion.div to avoid SSR mismatch */}
             <motion.div
               initial={{ opacity: 0, x: -5 }}
-              animate={{ opacity: 1, x: 0 }}
+              animate={lastRoute ? { opacity: 1, x: 0 } : { opacity: 0, x: -5 }}
               className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/5 px-3 py-1 text-[10px] text-violet-300 font-semibold"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-violet-400 animate-pulse" />
-              <span>Resume: </span>
-              <Link
-                href={lastRoute}
-                className="underline hover:text-white transition-colors"
-              >
-                {getRouteLabel(lastRoute)}
-              </Link>
+              {lastRoute && (
+                <>
+                  <span className="h-1.5 w-1.5 rounded-full bg-violet-400 animate-pulse" />
+                  <span>Resume: </span>
+                  <Link href={lastRoute} className="underline hover:text-white transition-colors">
+                    {getRouteLabel(lastRoute)}
+                  </Link>
+                </>
+              )}
             </motion.div>
-          )}
         </div>
 
         <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white mt-2">
