@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -14,15 +16,16 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', active: true },
-  { id: 'courses', label: 'Courses', icon: 'BookOpen', active: false },
-  { id: 'analytics', label: 'Analytics', icon: 'TrendingUp', active: false },
-  { id: 'schedule', label: 'Schedule', icon: 'Calendar', active: false },
-  { id: 'settings', label: 'Settings', icon: 'Settings', active: false },
+  { id: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', href: '/' },
+  { id: 'courses', label: 'Courses', icon: 'BookOpen', href: '/courses' },
+  { id: 'analytics', label: 'Analytics', icon: 'TrendingUp', href: '/analytics' },
+  { id: 'schedule', label: 'Schedule', icon: 'Calendar', href: '/schedule' },
+  { id: 'settings', label: 'Settings', icon: 'Settings', href: '/settings' },
 ];
 
 export function Sidebar({ isOpen, setIsOpen, avatarUrl, studentName = 'Student', studentLevel = 1 }: SidebarProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     setIsMounted(true);
@@ -81,38 +84,41 @@ export function Sidebar({ isOpen, setIsOpen, avatarUrl, studentName = 'Student',
         {/* Sidebar Navigation */}
         <nav className="flex-1 py-6 px-3">
           <ul className="space-y-1">
-            {NAV_ITEMS.map((item) => (
-              <li key={item.id}>
-                <a
-                  href="#"
-                  className={cn(
-                    "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all group relative overflow-hidden",
-                    item.active ? "text-white" : "hover:bg-white/5 hover:text-white text-zinc-400"
-                  )}
-                >
-                  {/* Framer motion layout selection background */}
-                  {item.active && (
-                    <motion.span
-                      layoutId="activeSidebarNav"
-                      className="absolute inset-0 bg-indigo-600/10 border-l-2 border-indigo-500 rounded-xl z-0"
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                  <span className="relative z-10 flex items-center gap-3 w-full">
-                    <DynamicIcon
-                      name={item.icon}
-                      className={cn(
-                        "transition-transform duration-200 group-hover:scale-110",
-                        item.active ? "text-indigo-400" : "text-zinc-500 group-hover:text-zinc-300"
-                      )}
-                    />
-                    {isOpen && (
-                      <span className="truncate">{item.label}</span>
+            {NAV_ITEMS.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <li key={item.id}>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all group relative overflow-hidden",
+                      isActive ? "text-white font-semibold" : "hover:bg-white/5 hover:text-white text-zinc-400"
                     )}
-                  </span>
-                </a>
-              </li>
-            ))}
+                  >
+                    {/* Framer motion layout selection background */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeSidebarNav"
+                        className="absolute inset-0 bg-indigo-600/10 border-l-2 border-indigo-500 rounded-xl z-0"
+                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10 flex items-center gap-3 w-full">
+                      <DynamicIcon
+                        name={item.icon}
+                        className={cn(
+                          "transition-transform duration-200 group-hover:scale-110",
+                          isActive ? "text-indigo-400" : "text-zinc-500 group-hover:text-zinc-300"
+                        )}
+                      />
+                      {isOpen && (
+                        <span className="truncate">{item.label}</span>
+                      )}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 

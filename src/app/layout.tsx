@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import { getDashboardData } from '@/lib/supabase/server';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -19,19 +21,27 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+// Disable layout caching to re-query database updates
+export const revalidate = 0;
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Query profile records server-side for shared layout menus
+  const data = await getDashboardData();
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
       style={{ colorScheme: 'dark' }}
     >
-      <body className="min-h-full flex flex-col bg-[#030014] text-zinc-50">
-        {children}
+      <body className="min-h-full flex flex-col bg-[#030014] text-zinc-50 overflow-hidden">
+        <DashboardLayout profile={data.profile}>
+          {children}
+        </DashboardLayout>
       </body>
     </html>
   );
