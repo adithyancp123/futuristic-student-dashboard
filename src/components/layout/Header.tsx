@@ -6,9 +6,10 @@ interface HeaderProps {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   title: string;
+  onSearchClick?: () => void;
 }
 
-export function Header({ sidebarOpen, setSidebarOpen, title }: HeaderProps) {
+export function Header({ sidebarOpen, setSidebarOpen, title, onSearchClick }: HeaderProps) {
   return (
     <header className="flex h-16 items-center justify-between border-b border-white/5 bg-[#030014]/50 backdrop-blur-md px-6 md:px-8 z-30 sticky top-0">
       <div className="flex items-center gap-4">
@@ -25,17 +26,19 @@ export function Header({ sidebarOpen, setSidebarOpen, title }: HeaderProps) {
       
       {/* Top navbar accessories */}
       <div className="flex items-center gap-4">
-        {/* Cyber styled search input */}
-        <div className="relative hidden sm:block">
-          <span className="absolute inset-y-0 left-3 flex items-center text-zinc-500 pointer-events-none">
-            <DynamicIcon name="Search" size={15} />
+        {/* Cyber styled search input converted to command trigger */}
+        <button
+          onClick={onSearchClick}
+          className="relative hidden sm:flex items-center justify-between w-52 rounded-xl bg-white/5 border border-white/5 hover:border-white/12 hover:bg-white/8 py-1.5 px-3.5 text-left text-xs text-zinc-400 placeholder-zinc-500 transition-all duration-300 cursor-pointer group shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)] shimmer-btn"
+        >
+          <span className="flex items-center gap-2">
+            <DynamicIcon name="Search" size={13} className="text-zinc-500 group-hover:text-zinc-300 transition-colors" />
+            <span>Search console...</span>
           </span>
-          <input
-            type="text"
-            placeholder="Search dashboard..."
-            className="w-48 rounded-xl bg-white/5 border border-white/5 py-1.5 pl-9 pr-4 text-xs text-white placeholder-zinc-500 focus:border-indigo-500/35 focus:bg-white/8 focus:outline-none transition-all duration-300"
-          />
-        </div>
+          <kbd className="hidden md:inline-flex items-center gap-0.5 text-[8px] font-black text-zinc-500 border border-white/5 bg-white/5 px-1.5 py-0.5 rounded uppercase select-none">
+            Ctrl K
+          </kbd>
+        </button>
         
         {/* Notifications Icon with active glowing dot */}
         <button

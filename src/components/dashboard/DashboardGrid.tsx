@@ -1,12 +1,13 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { HeroTile } from '@/components/dashboard/HeroTile';
 import { XPOverviewTile } from '@/components/dashboard/XPOverviewTile';
 import { ActivityTile } from '@/components/dashboard/ActivityTile';
 import { UpcomingTasksTile } from '@/components/dashboard/UpcomingTasksTile';
 import { CourseCard } from '@/components/dashboard/CourseCard';
 import { DashboardData } from '@/types/dashboard';
-import { motion, Variants } from 'framer-motion';
+import { motion, Variants, AnimatePresence } from 'framer-motion';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -35,6 +36,22 @@ const itemVariants: Variants = {
 
 export function DashboardGrid({ data }: { data: DashboardData }) {
   const { profile, courses, activities, tasks } = data;
+  const [telemetryIndex, setTelemetryIndex] = useState(0);
+
+  const telemetryMessages = [
+    `Peak productivity window detected. Recommended syllabus: ${courses[0]?.title || 'Advanced Web Architectures'}.`,
+    "Learning velocity up 12% this week. Cognitive load balanced.",
+    `Consistency score improving. ${profile.streak_days}-day streak multiplier active!`,
+    "Supabase database telemetry link secured. Routes resolving dynamically.",
+    "GPU layout acceleration active. Rendering transitions at native compositor frame rates."
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTelemetryIndex((prev) => (prev + 1) % telemetryMessages.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [telemetryMessages.length]);
 
   return (
     <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
@@ -42,6 +59,40 @@ export function DashboardGrid({ data }: { data: DashboardData }) {
         <span className="text-[10px] font-bold tracking-widest text-indigo-400 uppercase">Operational Console</span>
         <h2 className="text-xl font-black text-white tracking-wider uppercase">Student Telemetry</h2>
       </header>
+
+      {/* Ambient Intelligence Layer Telemetry Bar */}
+      <section className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 px-4 glass-panel rounded-xl text-xs text-zinc-400 bg-white/2 border border-white/5 relative overflow-hidden">
+        <div className="grain-mesh" />
+        
+        <div className="flex items-center gap-2 relative z-10 min-w-0 w-full">
+          <span className="flex h-2 w-2 relative flex-shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+          </span>
+          <span className="font-bold text-[9px] uppercase tracking-wider text-indigo-400 flex-shrink-0">Intelligence Telemetry:</span>
+          <div className="relative h-4 overflow-hidden w-full flex items-center">
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={telemetryIndex}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+                className="truncate text-zinc-300 font-medium absolute left-0 text-[11px]"
+              >
+                {telemetryMessages[telemetryIndex]}
+              </motion.span>
+            </AnimatePresence>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-3 relative z-10 flex-shrink-0 select-none">
+          <span className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-zinc-500 bg-white/5 px-2 py-0.5 rounded border border-white/5">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_6px_rgba(16,185,129,0.7)]" />
+            System Synced
+          </span>
+        </div>
+      </section>
 
       {/* Staggered entrance bento layout */}
       <motion.section

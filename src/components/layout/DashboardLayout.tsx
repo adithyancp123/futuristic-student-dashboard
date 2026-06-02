@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { StudentProfile } from '@/types/dashboard';
+import { CommandPalette } from '@/components/ui/CommandPalette';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-[#030014] text-zinc-50 overflow-hidden font-sans">
@@ -30,9 +32,17 @@ export function DashboardLayout({ children, profile }: DashboardLayoutProps) {
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           title="Academy Command Console"
+          onSearchClick={() => setCommandPaletteOpen(true)}
         />
         {children}
       </div>
+
+      {/* Global Command Palette dialog (Ctrl+K) */}
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        setIsOpen={setCommandPaletteOpen}
+        toggleSidebar={() => setSidebarOpen(prev => !prev)}
+      />
     </div>
   );
 }
