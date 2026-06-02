@@ -18,17 +18,23 @@ interface HeroTileProps {
 export function HeroTile({ name, streakDays }: HeroTileProps) {
   // Hydration‑safe mount detection
   const [mounted, setMounted] = useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Mounted state removed; not needed for SSR-safe rendering
-  // Initialize greeting and lastRoute safely for SSR
-  const [greeting] = useState(() => {
-    if (typeof window === 'undefined') return 'Welcome back';
+  // Initialize greeting with static fallback
+  const [greeting, setGreeting] = useState('Welcome back');
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => {
+    if (!mounted) return;
     const h = new Date().getHours();
-    return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-  });
+    const nextGreeting = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+    setGreeting(nextGreeting);
+  }, [mounted]);
+
+  // Mounted state removed; not needed for SSR-safe rendering
+  // Initialize lastRoute safely for SSR
   const [lastRoute] = useState(() => {
     if (typeof window === 'undefined') return null;
     const saved = localStorage.getItem('last_visited_route');
