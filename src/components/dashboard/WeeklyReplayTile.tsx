@@ -66,7 +66,7 @@ export function WeeklyReplayTile({ courses }: WeeklyReplayTileProps) {
         </button>
       </header>
       <ul className="space-y-2">
-        <AnimatePresence mode="wait" key={replayKey}>
+        <AnimatePresence mode="sync" key={replayKey}>
           {timeline.map((ev, i) => (
             <motion.li
               key={ev.day}

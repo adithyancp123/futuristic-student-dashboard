@@ -65,7 +65,7 @@ export function OnboardingOverlay() {
               <DynamicIcon name="Award" className="text-indigo-400 relative z-10 animate-pulse" size={24} />
             </div>
             <div className="space-y-2 h-16 flex flex-col justify-center">
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="sync">
                 <motion.div
                   key={stage}
                   initial={{ opacity: 0, y: 6 }}
