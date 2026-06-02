@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
 
@@ -16,6 +16,12 @@ interface HeroTileProps {
 }
 
 export function HeroTile({ name, streakDays }: HeroTileProps) {
+  // Hydration‑safe mount detection
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Mounted state removed; not needed for SSR-safe rendering
   // Initialize greeting and lastRoute safely for SSR
   const [greeting] = useState(() => {
@@ -57,10 +63,17 @@ export function HeroTile({ name, streakDays }: HeroTileProps) {
                       {/* Resume badge - always render motion.div to avoid SSR mismatch */}
             <motion.div
               initial={{ opacity: 0, x: -5 }}
-              animate={lastRoute ? { opacity: 1, x: 0 } : { opacity: 0, x: -5 }}
+              animate={mounted && lastRoute ? { opacity: 1, x: 0 } : { opacity: 0, x: -5 }}
               className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/5 px-3 py-1 text-[10px] text-violet-300 font-semibold"
             >
-              {lastRoute && (
+              {/* Hydration‑safe placeholder before client mount */}
+              {!mounted ? (
+                <>
+                  <span className="h-1.5 w-1.5 rounded-full bg-violet-400" style={{ opacity: 0 }} />
+                  <span style={{ opacity: 0 }}>Resume: </span>
+                  <span style={{ opacity: 0 }}>placeholder</span>
+                </>
+              ) : lastRoute ? (
                 <>
                   <span className="h-1.5 w-1.5 rounded-full bg-violet-400 animate-pulse" />
                   <span>Resume: </span>
@@ -68,7 +81,7 @@ export function HeroTile({ name, streakDays }: HeroTileProps) {
                     {getRouteLabel(lastRoute)}
                   </Link>
                 </>
-              )}
+              ) : null}
             </motion.div>
         </div>
 
