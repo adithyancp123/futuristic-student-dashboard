@@ -29,7 +29,7 @@ const itemVariants: Variants = {
   show: {
     opacity: 1,
     y: 0,
-    transition: { type: 'spring', stiffness: 90, damping: 14 },
+    transition: { type: 'spring', stiffness: 300, damping: 22, mass: 0.85 },
   },
 };
 

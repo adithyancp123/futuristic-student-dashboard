@@ -26,7 +26,7 @@ const itemVariants: Variants = {
   show: {
     opacity: 1,
     y: 0,
-    transition: { type: 'spring', stiffness: 90, damping: 14 },
+    transition: { type: 'spring', stiffness: 300, damping: 22, mass: 0.85 },
   },
 };
 
@@ -118,7 +118,7 @@ export function SettingsView({ profile }: SettingsViewProps) {
                 >
                   <motion.span
                     layout
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 22, mass: 0.85 }}
                     className="block h-4 w-4 rounded-full bg-white shadow-md"
                     style={{ x: holographicUi ? 20 : 0 }}
                   />
@@ -139,7 +139,7 @@ export function SettingsView({ profile }: SettingsViewProps) {
                 >
                   <motion.span
                     layout
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 22, mass: 0.85 }}
                     className="block h-4 w-4 rounded-full bg-white shadow-md"
                     style={{ x: dbWebhooks ? 20 : 0 }}
                   />
@@ -160,7 +160,7 @@ export function SettingsView({ profile }: SettingsViewProps) {
                 >
                   <motion.span
                     layout
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 22, mass: 0.85 }}
                     className="block h-4 w-4 rounded-full bg-white shadow-md"
                     style={{ x: emailsNotify ? 20 : 0 }}
                   />
