@@ -4,18 +4,28 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
 
-export function OnboardingOverlay() {
-  // Lazy initialise visibility based on localStorage flag
-  const [visible, setVisible] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return !localStorage.getItem('has_onboarded_v2');
-    }
-    return false;
-  });
+export default function OnboardingOverlay() {
+  // Hydration‑safe mount detection
+  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [stage, setStage] = useState(0);
 
+  // Run after component mounts to sync with localStorage
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounted(true);
+      if (typeof window !== 'undefined') {
+        const dismissed = localStorage.getItem('has_onboarded_v2');
+        if (dismissed) setVisible(false);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleComplete = useCallback(() => {
-    localStorage.setItem('has_onboarded_v2', 'true');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('has_onboarded_v2', 'true');
+    }
     setVisible(false);
   }, []);
 
@@ -37,6 +47,8 @@ export function OnboardingOverlay() {
     { title: 'Calibrating Visual Compositor', desc: 'Accelerating GPU interfaces for native frame rates...' },
     { title: 'Academy Interface Secured', desc: 'Welcome back. Terminal console online.' },
   ];
+
+  if (!mounted) return null;
 
   return (
     <AnimatePresence>

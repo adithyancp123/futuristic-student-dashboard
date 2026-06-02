@@ -5,7 +5,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { StudentProfile } from '@/types/dashboard';
 import { CommandPalette } from '@/components/ui/CommandPalette';
-import { OnboardingOverlay } from '@/components/ui/OnboardingOverlay';
+import OnboardingOverlay from '@/components/ui/OnboardingOverlay';
 import { usePathname } from 'next/navigation';
 
 interface DashboardLayoutProps {

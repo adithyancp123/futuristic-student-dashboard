@@ -16,21 +16,23 @@ interface HeroTileProps {
 }
 
 export function HeroTile({ name, streakDays }: HeroTileProps) {
-  // Hydration‑safe mount detection
   const [mounted, setMounted] = useState(false);
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Initialize greeting with static fallback
   const [greeting, setGreeting] = useState('Welcome back');
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+
   useEffect(() => {
     if (!mounted) return;
-    const h = new Date().getHours();
-    const nextGreeting = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-    setGreeting(nextGreeting);
+    const timer = setTimeout(() => {
+      const h = new Date().getHours();
+      const nextGreeting = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+      setGreeting(nextGreeting);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [mounted]);
 
   // Mounted state removed; not needed for SSR-safe rendering
